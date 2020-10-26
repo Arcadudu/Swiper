@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
 
     <androidx.constraintlayout.widget.ConstraintLayout
 
@@ -14,6 +12,19 @@
         android:background="@android:color/holo_green_light"
         android:orientation="vertical"
         tools:context=".MainActivity">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/holo_green_dark"
+            android:textAlignment="viewStart"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="My TITLE"
+            app:titleTextColor="@color/white" />
+
 
         <TextView
             android:id="@+id/tv_listIsEmpty"
@@ -37,18 +48,9 @@
             android:layout_marginTop="24dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginEnd="16dp"
-            android:gravity="center"
-            android:orientation="vertical"
 
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_refresh"
@@ -58,7 +60,10 @@
                 android:backgroundTint="@color/holo_green_dark"
                 android:src="@drawable/ic_baseline_refresh_24"
                 app:borderWidth="0dp"
-                app:fabSize="mini" />
+                app:fabSize="mini"
+                app:layout_constraintStart_toStartOf="@id/fab_delete_all"
+                app:layout_constraintBottom_toTopOf="@id/fab_delete_all"
+                app:layout_constraintEnd_toEndOf="@id/fab_delete_all"/>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_delete_all"
@@ -68,24 +73,49 @@
                 android:backgroundTint="@color/holo_green_dark"
                 android:src="@drawable/ic_baseline_delete_12"
                 app:borderWidth="0dp"
-                app:fabSize="mini" />
+                app:fabSize="mini"
+                app:layout_constraintBottom_toTopOf="@id/fab_main"
+                app:layout_constraintEnd_toEndOf="@id/fab_main"
+                app:layout_constraintStart_toStartOf="@id/fab_main"
+                />
 
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_main"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:layout_marginBottom="16dp"
                 android:backgroundTint="@color/holo_green_dark"
-                android:src="@drawable/ic_baseline_reorder_24"
                 app:borderWidth="0dp"
-                app:fabSize="normal" />
+                app:elevation="4dp"
+                app:fabSize="normal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
 
+        <ImageView
+            android:id="@+id/fab_main_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_reorder_24"
+            app:layout_constraintTop_toTopOf="@id/fab_main"
+            app:layout_constraintBottom_toBottomOf="@id/fab_main"
+            app:layout_constraintEnd_toEndOf="@id/fab_main"
+            android:elevation="8dp"
+            app:layout_constraintStart_toStartOf="@id/fab_main"/>
 
-        </LinearLayout>
+        <View
+            android:id="@+id/tr"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/black_opacity50"
+            android:alpha="0"
+            android:elevation="6dp"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <include layout="@layout/bottom_sheet_layout"/>
+    <include
+        layout="@layout/bottom_sheet_layout"
+        />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,24 +24,22 @@ import java.util.List;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, ILongClickCallBack {
 
 
     private RecyclerView recyclerView;
     private MyAdapter adapter;
     private List<Model> recyclerModelList = new ArrayList<>();
     private List<Model> masterModelList = new ArrayList<>();
-//    private List<Model> archivedModels = new ArrayList<>();
-
 
     private Model chosenModel = null;
-
 
     private TextView tv_emptyListSign;
 
     // bottom sheet
     private ConstraintLayout bottomSheet;
     private BottomSheetBehavior bottomSheetBehavior;
+    private View transparentBackground;
 
     private ImageView bs_image;
     private TextView bs_title, bs_description;
@@ -48,8 +47,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // floating buttons
     private FloatingActionButton fabMain, fabRefresh, fabDeleteAll;
     private boolean fabMenuOpened = false;
-    private Float translationY = 100f;
+    private final Float translationY = 100f;
     private final long fabDuration = 200;
+
+    private ImageView fabIcon;
 
 
     @Override
@@ -69,19 +70,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adapter = new MyAdapter(recyclerModelList, this);
         new ItemTouchHelper(simpleCallback).attachToRecyclerView(recyclerView);
         recyclerView.setAdapter(adapter);
+        adapter.setLongClickCallBack(this);
 
         // bottom_sheet
         bottomSheet = findViewById(R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-//        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         bs_image = findViewById(R.id.bs_imageView);
         bs_title = findViewById(R.id.bs_title);
         bs_description = findViewById(R.id.bs_description);
+        transparentBackground = findViewById(R.id.tr);
+        bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                if (newState == BottomSheetBehavior.STATE_HIDDEN)
+                    transparentBackground.setAlpha(0f);
 
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
 
     }
-
-
 
 
     private void packMasterModelList() {
@@ -106,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fabMain = findViewById(R.id.fab_main);
         fabRefresh = findViewById(R.id.fab_refresh);
         fabDeleteAll = findViewById(R.id.fab_delete_all);
+        fabIcon = findViewById(R.id.fab_main_icon);
 
         fabRefresh.setAlpha(0f);
         fabDeleteAll.setAlpha(0f);
@@ -137,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 recyclerModelList.clear();
                 adapter.notifyDataSetChanged();
                 break;
+
         }
         checkIfListIsEmpty();
     }
@@ -153,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void openFabMenu() {
         fabMenuOpened = !fabMenuOpened;
-        fabMain.animate().rotation(180f).setDuration(fabDuration).start();
+        fabIcon.animate().rotation(180f).setDuration(fabDuration).start();
 
         fabRefresh.animate().alpha(1f).translationY(0f).setDuration(fabDuration).start();
         fabDeleteAll.animate().alpha(1f).translationY(0f).setDuration(fabDuration).start();
@@ -164,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void closeFabMenu() {
         fabMenuOpened = !fabMenuOpened;
-        fabMain.animate().rotation(0f).setDuration(fabDuration).start();
+        fabIcon.animate().rotation(0f).setDuration(fabDuration).start();
 
         fabRefresh.animate().alpha(0f).translationY(translationY).setDuration(fabDuration).start();
         fabDeleteAll.animate().alpha(0f).translationY(translationY).setDuration(fabDuration).start();
@@ -198,19 +213,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 }
                             }).show();
                     break;
-                // right - archive:
-//                case ItemTouchHelper.RIGHT:
-//                    chosenModel = recyclerModelList.get(position);
-//                    archivedModels.add(chosenModel);
-//                    adapter.notifyDataSetChanged();
-//                    Snackbar.make(recyclerView, chosenModel.getTitle() + " архивировано", Snackbar.LENGTH_LONG)
-//                            .setAction("отмена", new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View v) {
-//                                    archivedModels.remove(chosenModel);
-//                                }
-//                            }).show();
-//                    break;
+
             }
         }
 
@@ -219,8 +222,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
                     // left - delete - red - delete icon
-                    .addBackgroundColor(R.color.red_delete)
-//                    .addSwipeLeftBackgroundColor(R.color.red_delete)
+//                    .addBackgroundColor(R.color.white)
+                    .addSwipeLeftBackgroundColor(R.color.red_delete)
                     .addSwipeLeftActionIcon(R.drawable.ic_baseline_delete_24)
                     // right - archive - blue - archive icon
 //                    .addSwipeRightBackgroundColor(R.color.blue_archive)
@@ -247,4 +250,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    @Override
+    public void click(Model model) {
+        bs_image.setImageResource(model.getImage());
+        bs_title.setText(model.getTitle());
+        bs_description.setText(model.getDescription());
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+         transparentBackground.setAlpha(1f);
+    }
 }

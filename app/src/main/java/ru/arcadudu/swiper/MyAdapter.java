@@ -1,10 +1,13 @@
 package ru.arcadudu.swiper;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,6 +20,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     private List<Model> modelList = new ArrayList<>();
     private Context context;
+
+    ILongClickCallBack longClickCallBack;
+
+    public void setLongClickCallBack(ILongClickCallBack longClickCallBack) {
+        this.longClickCallBack = longClickCallBack;
+    }
 
     public MyAdapter(List<Model> modelList, Context context) {
         this.modelList = modelList;
@@ -57,8 +66,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-//                    modelList.remove(getAdapterPosition());
-//                    notifyItemRemoved(getAdapterPosition());
+                    int position = getAdapterPosition();
+                    openBottomSheet(v, position);
 
                     return true;
                 }
@@ -67,6 +76,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
         @Override
         public void onClick(View v) {
+        }
+
+        private void openBottomSheet(View view, int position) {
+            longClickCallBack.click(modelList.get(position));
         }
     }
 }

@@ -3,13 +3,14 @@ package ru.arcadudu.swiper;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,30 +28,29 @@ import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, ILongClickCallBack {
 
 
+    // recycler
     private RecyclerView recyclerView;
     private MyAdapter adapter;
     private List<Model> recyclerModelList = new ArrayList<>();
     private List<Model> masterModelList = new ArrayList<>();
 
-    private Model chosenModel = null;
-
-    private TextView tv_emptyListSign;
-
     // bottom sheet
     private ConstraintLayout bottomSheet;
     private BottomSheetBehavior bottomSheetBehavior;
-    private View transparentBackground;
-
     private ImageView bs_image;
     private TextView bs_title, bs_description;
+    private View transparentBackground;
 
     // floating buttons
     private FloatingActionButton fabMain, fabRefresh, fabDeleteAll;
     private boolean fabMenuOpened = false;
     private final Float translationY = 100f;
     private final long fabDuration = 200;
-
     private ImageView fabIcon;
+
+    // misc
+    private Model chosenModel = null;
+    private TextView tv_emptyListSign;
 
 
     @Override
@@ -58,12 +58,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setTransparentStatusBar();
+
         setFabs();
+
         packMasterModelList();
         packModelList();
 
         tv_emptyListSign = findViewById(R.id.tv_listIsEmpty);
-        checkIfListIsEmpty();
+        checkIfListIsEmpty(); // string will appear if list is empty
 
         recyclerView = findViewById(R.id.recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -83,9 +86,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                if (newState == BottomSheetBehavior.STATE_HIDDEN)
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    fabMain.show();
                     transparentBackground.setAlpha(0f);
-
+//                    Animation fadeOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out);
+//                    transparentBackground.startAnimation(fadeOut);
+//                    CountDownTimer timer = new CountDownTimer(410, 0) {
+//                        @Override
+//                        public void onTick(long millisUntilFinished) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onFinish() {
+//                            transparentBackground.setAlpha(0f);
+//                        }
+//                    }.start();
+                } else {
+                    fabMain.hide();
+                }
             }
 
             @Override
@@ -96,23 +115,98 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    // touchHelper
+    ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
 
-    private void packMasterModelList() {
-        String content = " " + getString(R.string.progLang);
-        masterModelList.add(new Model(getString(R.string.java), getString(R.string.java) + content, R.drawable.icon_java, getString(R.string.java_description)));
-        masterModelList.add(new Model(getString(R.string.javascript), getString(R.string.javascript) + content, R.drawable.icon_javascript, getString(R.string.java_script_description)));
-        masterModelList.add(new Model(getString(R.string.haskell), getString(R.string.haskell) + content, R.drawable.icon_haskel, getString(R.string.haskell_description)));
-        masterModelList.add(new Model(getString(R.string.python), getString(R.string.python) + content, R.drawable.icon_python, getString(R.string.python_description)));
-        masterModelList.add(new Model(getString(R.string.csharp), getString(R.string.csharp) + content, R.drawable.icon_c_sharp, getString(R.string.csharp_description)));
-        masterModelList.add(new Model(getString(R.string.ruby), getString(R.string.ruby) + content, R.drawable.icon_ruby, getString(R.string.ruby_description)));
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            int position = viewHolder.getAdapterPosition();
+            switch (direction) {
+                // left - delete:
+                case ItemTouchHelper.LEFT:
+                    chosenModel = recyclerModelList.get(position);
+                    recyclerModelList.remove(chosenModel);
+                    adapter.notifyDataSetChanged();
+                    Snackbar.make(recyclerView, chosenModel.getTitle() + " удалено", Snackbar.LENGTH_LONG)
+                            .setAction("отмена", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    recyclerModelList.add(position, chosenModel);
+                                    adapter.notifyDataSetChanged();
+                                }
+                            }).show();
+                    break;
+
+            }
+        }
+
+        public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+
+            new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                    // left - delete - red - delete icon
+                    .addBackgroundColor(R.color.white)
+//                    .addSwipeLeftBackgroundColor(R.color.red_delete)
+                    .addSwipeLeftActionIcon(R.drawable.ic_baseline_delete_24)
+                    // right - archive - blue - archive icon
+//                    .addSwipeRightBackgroundColor(R.color.blue_archive)
+                    //.addSwipeRightActionIcon(R.drawable.ic_baseline_archive_24)
+                    .create()
+                    .decorate();
+
+        }
+    };
+
+    // interface
+    @Override
+    public void click(Model model) {
+        bs_image.setImageResource(model.getImage());
+        bs_title.setText(model.getTitle());
+        bs_description.setText(model.getDescription());
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//        Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
+//        transparentBackground.startAnimation(fadeIn);
+        transparentBackground.setAlpha(1f);
+
     }
 
-    private void checkIfListIsEmpty() {
-        if (recyclerModelList.isEmpty()) {
-            tv_emptyListSign.setVisibility(View.VISIBLE);
-        } else {
-            tv_emptyListSign.setVisibility(View.GONE);
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.fab_main:
+                checkIfFabMenuOpened();
+                break;
+            case R.id.fab_refresh:
+                closeFabMenu();
+                packModelList();
+                adapter.notifyDataSetChanged();
+                break;
+            case R.id.fab_delete_all:
+                closeFabMenu();
+                recyclerModelList.clear();
+                adapter.notifyDataSetChanged();
+                break;
+
         }
+        checkIfListIsEmpty();
+    }
+
+    private void setTransparentStatusBar() {
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setFlags(
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        window.setFlags(
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setNavigationBarColor(getResources().getColor(android.R.color.transparent, getTheme()));
+        window.setStatusBarColor(getResources().getColor(android.R.color.transparent, getTheme()));
+
     }
 
     private void setFabs() {
@@ -135,25 +229,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fabDeleteAll.setEnabled(false);
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.fab_main:
-                checkIfFabMenuOpened();
-                break;
-            case R.id.fab_refresh:
-                closeFabMenu();
-                packModelList();
-                adapter.notifyDataSetChanged();
-                break;
-            case R.id.fab_delete_all:
-                closeFabMenu();
-                recyclerModelList.clear();
-                adapter.notifyDataSetChanged();
-                break;
+    private void packMasterModelList() {
+        String content = " " + getString(R.string.progLang);
+        masterModelList.add(new Model(getString(R.string.java), getString(R.string.java) + content, R.drawable.icon_java, getString(R.string.java_description)));
+        masterModelList.add(new Model(getString(R.string.javascript), getString(R.string.javascript) + content, R.drawable.icon_javascript, getString(R.string.java_script_description)));
+        masterModelList.add(new Model(getString(R.string.haskell), getString(R.string.haskell) + content, R.drawable.icon_haskel, getString(R.string.haskell_description)));
+        masterModelList.add(new Model(getString(R.string.python), getString(R.string.python) + content, R.drawable.icon_python, getString(R.string.python_description)));
+        masterModelList.add(new Model(getString(R.string.csharp), getString(R.string.csharp) + content, R.drawable.icon_c_sharp, getString(R.string.csharp_description)));
+        masterModelList.add(new Model(getString(R.string.ruby), getString(R.string.ruby) + content, R.drawable.icon_ruby, getString(R.string.ruby_description)));
+    }
+
+    private void packModelList() {
+        if (recyclerModelList.isEmpty()) {
+            recyclerModelList.addAll(masterModelList);
+        } else if (recyclerModelList.size() == masterModelList.size()) {
+            Toast.makeText(this, "Список уже полон", Toast.LENGTH_SHORT).show();
+        } else {
+            for (int i = 0; i < masterModelList.size(); i++) {
+                if (!recyclerModelList.contains(masterModelList.get(i)))
+                    recyclerModelList.add(i, masterModelList.get(i));
+            }
 
         }
-        checkIfListIsEmpty();
+
+    }
+
+    private void checkIfListIsEmpty() {
+        if (recyclerModelList.isEmpty()) {
+            tv_emptyListSign.setVisibility(View.VISIBLE);
+        } else {
+            tv_emptyListSign.setVisibility(View.GONE);
+        }
     }
 
     private void checkIfFabMenuOpened() {
@@ -188,74 +294,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fabDeleteAll.setEnabled(false);
     }
 
-
-    ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-        @Override
-        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-            return false;
-        }
-
-        @Override
-        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-            int position = viewHolder.getAdapterPosition();
-            switch (direction) {
-                // left - delete:
-                case ItemTouchHelper.LEFT:
-                    chosenModel = recyclerModelList.get(position);
-                    recyclerModelList.remove(chosenModel);
-                    adapter.notifyDataSetChanged();
-                    Snackbar.make(recyclerView, chosenModel.getTitle() + " удалено", Snackbar.LENGTH_LONG)
-                            .setAction("отмена", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    recyclerModelList.add(position, chosenModel);
-                                    adapter.notifyDataSetChanged();
-                                }
-                            }).show();
-                    break;
-
-            }
-        }
-
-        public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-
-            new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                    // left - delete - red - delete icon
-//                    .addBackgroundColor(R.color.white)
-                    .addSwipeLeftBackgroundColor(R.color.red_delete)
-                    .addSwipeLeftActionIcon(R.drawable.ic_baseline_delete_24)
-                    // right - archive - blue - archive icon
-//                    .addSwipeRightBackgroundColor(R.color.blue_archive)
-                    //.addSwipeRightActionIcon(R.drawable.ic_baseline_archive_24)
-                    .create()
-                    .decorate();
-
-        }
-    };
-
-    private void packModelList() {
-        if (recyclerModelList.isEmpty()) {
-            recyclerModelList.addAll(masterModelList);
-        } else if (recyclerModelList.size() == masterModelList.size()) {
-            Toast.makeText(this, "Список уже полон", Toast.LENGTH_SHORT).show();
-        } else {
-            for (int i = 0; i < masterModelList.size(); i++) {
-                if (!recyclerModelList.contains(masterModelList.get(i)))
-                    recyclerModelList.add(i, masterModelList.get(i));
-            }
-
-        }
-
-    }
-
-
-    @Override
-    public void click(Model model) {
-        bs_image.setImageResource(model.getImage());
-        bs_title.setText(model.getTitle());
-        bs_description.setText(model.getDescription());
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-         transparentBackground.setAlpha(1f);
-    }
 }

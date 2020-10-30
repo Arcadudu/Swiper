@@ -71,10 +71,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         recyclerView = findViewById(R.id.recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new MyAdapter(recyclerModelList, this);
+        adapter = new MyAdapter(recyclerModelList, this, this);
         new ItemTouchHelper(simpleCallback).attachToRecyclerView(recyclerView);
         recyclerView.setAdapter(adapter);
-        adapter.setLongClickCallBack(this);
+//        adapter.setLongClickCallBack(this);
 
         // bottom_sheet
         bottomSheet = findViewById(R.id.bottom_sheet);
@@ -236,12 +236,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void packMasterModelList() {
         String content = " " + getString(R.string.progLang);
+        //plain model
+        masterModelList.add(new Model(getString(R.string.app_name)));
+
         masterModelList.add(new Model(getString(R.string.java), getString(R.string.java) + content, R.drawable.icon_java, getString(R.string.java_description)));
         masterModelList.add(new Model(getString(R.string.javascript), getString(R.string.javascript) + content, R.drawable.icon_javascript, getString(R.string.java_script_description)));
         masterModelList.add(new Model(getString(R.string.haskell), getString(R.string.haskell) + content, R.drawable.icon_haskel, getString(R.string.haskell_description)));
+        //ads model
+        masterModelList.add(new Model("https://brandbook.dodopizza.info/BillboardMockup.a2ad115b.jpg"));
+
         masterModelList.add(new Model(getString(R.string.python), getString(R.string.python) + content, R.drawable.icon_python, getString(R.string.python_description)));
         masterModelList.add(new Model(getString(R.string.csharp), getString(R.string.csharp) + content, R.drawable.icon_c_sharp, getString(R.string.csharp_description)));
         masterModelList.add(new Model(getString(R.string.ruby), getString(R.string.ruby) + content, R.drawable.icon_ruby, getString(R.string.ruby_description)));
+        masterModelList.add(new Model("Размер списка: " + masterModelList.size()));
     }
 
     private void packModelList() {

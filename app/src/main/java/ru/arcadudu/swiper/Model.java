@@ -7,6 +7,9 @@ public class Model implements Serializable {
     private String title, content, description;
     private int image;
 
+
+
+    // regular model
     public Model(String title, String content, int image, String description) {
         this.title = title;
         this.content = content;
@@ -45,6 +48,25 @@ public class Model implements Serializable {
     public void setDescription(String description) {
         this.description = description;
     }
+
+
+
+    // ads model
+    private String link;
+
+    public Model(String link) {
+        this.link = link;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
+
 }
 
 

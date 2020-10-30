@@ -2,12 +2,12 @@
     <string name="app_name">Swiper</string>
 
 
-        <string name="java">Java</string>
-        <string name="javascript">Java-Script</string>
-        <string name="haskell">Haskell</string>
-        <string name="python">Python</string>
-        <string name="ruby">Ruby</string>
-        <string name="csharp">C-sharp</string>
+    <string name="java">Java</string>
+    <string name="javascript">Java-Script</string>
+    <string name="haskell">Haskell</string>
+    <string name="python">Python</string>
+    <string name="ruby">Ruby</string>
+    <string name="csharp">C-sharp</string>
 
     <string name="progLang"> is a programming language.</string>
     <string name="empty_list_sign">Здесь будет отображаться список</string>

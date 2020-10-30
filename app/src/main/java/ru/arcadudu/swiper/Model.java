@@ -1,6 +1,8 @@
 package ru.arcadudu.swiper;
 
-public class Model {
+import java.io.Serializable;
+
+public class Model implements Serializable {
 
     private String title, content, description;
     private int image;

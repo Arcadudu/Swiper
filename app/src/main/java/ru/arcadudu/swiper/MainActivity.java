@@ -2,6 +2,7 @@ package ru.arcadudu.swiper;
 
 import android.graphics.Canvas;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -82,13 +83,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bs_image = findViewById(R.id.bs_imageView);
         bs_title = findViewById(R.id.bs_title);
         bs_description = findViewById(R.id.bs_description);
+        bottomSheet.setOnLongClickListener(view -> false);
         transparentBackground = findViewById(R.id.tr);
         bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     fabMain.show();
-                    transparentBackground.setAlpha(0f);
+//                    transparentBackground.setAlpha(0f);
 //                    Animation fadeOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out);
 //                    transparentBackground.startAnimation(fadeOut);
 //                    CountDownTimer timer = new CountDownTimer(410, 0) {
@@ -109,7 +111,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-
+                Log.e("AA", "offset = " + slideOffset);
+                if (slideOffset <= 0) {
+                    transparentBackground.setAlpha(slideOffset + 1);
+                }
             }
         });
 
@@ -170,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 //        Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
 //        transparentBackground.startAnimation(fadeIn);
-        transparentBackground.setAlpha(1f);
+//        transparentBackground.setAlpha(1f);
 
     }
 

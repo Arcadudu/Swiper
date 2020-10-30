@@ -9,6 +9,7 @@ public class Model implements Serializable {
 
 
 
+
     // regular model
     public Model(String title, String content, int image, String description) {
         this.title = title;
@@ -50,12 +51,20 @@ public class Model implements Serializable {
     }
 
 
+    // plain model
+    public Model(String title){
+        this.title = title;
+    }
+
+
 
     // ads model
     private String link;
+    private boolean ads;
 
-    public Model(String link) {
+    public Model(String link, boolean ads) {
         this.link = link;
+        this.ads = ads;
     }
 
     public String getLink() {
@@ -66,7 +75,13 @@ public class Model implements Serializable {
         this.link = link;
     }
 
+    public boolean isAds() {
+        return ads;
+    }
 
+    public void setAds(boolean ads) {
+        this.ads = ads;
+    }
 }
 
 

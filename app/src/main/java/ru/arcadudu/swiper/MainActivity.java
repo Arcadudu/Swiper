@@ -150,18 +150,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
 
-            new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                    // left - delete - red - delete icon
-                    .addBackgroundColor(R.color.white)
-//                    .addSwipeLeftBackgroundColor(R.color.red_delete)
-                    .addSwipeLeftActionIcon(R.drawable.ic_baseline_delete_24)
-                    // right - archive - blue - archive icon
-//                    .addSwipeRightBackgroundColor(R.color.blue_archive)
-                    //.addSwipeRightActionIcon(R.drawable.ic_baseline_archive_24)
-                    .create()
-                    .decorate();
+
+            if (viewHolder.getClass() == MyAdapter.ViewHolderRegular.class) {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                        // left - delete - red - delete icon
+                        .addBackgroundColor(R.color.white)
+                        .addSwipeLeftActionIcon(R.drawable.ic_baseline_delete_24)
+                        .create()
+                        .decorate();
+            }
+
 
         }
     };
@@ -173,10 +173,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bs_title.setText(model.getTitle());
         bs_description.setText(model.getDescription());
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-//        Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
-//        transparentBackground.startAnimation(fadeIn);
-//        transparentBackground.setAlpha(1f);
-
     }
 
     @Override
@@ -236,19 +232,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void packMasterModelList() {
         String content = " " + getString(R.string.progLang);
+        String plainItem = " (this is an item too)";
         //plain model
-        masterModelList.add(new Model(getString(R.string.app_name)));
+        masterModelList.add(new Model(getString(R.string.app_name) + plainItem));
 
         masterModelList.add(new Model(getString(R.string.java), getString(R.string.java) + content, R.drawable.icon_java, getString(R.string.java_description)));
         masterModelList.add(new Model(getString(R.string.javascript), getString(R.string.javascript) + content, R.drawable.icon_javascript, getString(R.string.java_script_description)));
         masterModelList.add(new Model(getString(R.string.haskell), getString(R.string.haskell) + content, R.drawable.icon_haskel, getString(R.string.haskell_description)));
         //ads model
-        masterModelList.add(new Model("https://brandbook.dodopizza.info/BillboardMockup.a2ad115b.jpg"));
+        masterModelList.add(new Model("https://brandbook.dodopizza.info/BillboardMockup.a2ad115b.jpg", true));
 
         masterModelList.add(new Model(getString(R.string.python), getString(R.string.python) + content, R.drawable.icon_python, getString(R.string.python_description)));
         masterModelList.add(new Model(getString(R.string.csharp), getString(R.string.csharp) + content, R.drawable.icon_c_sharp, getString(R.string.csharp_description)));
         masterModelList.add(new Model(getString(R.string.ruby), getString(R.string.ruby) + content, R.drawable.icon_ruby, getString(R.string.ruby_description)));
-        masterModelList.add(new Model("Размер списка: " + masterModelList.size()));
+        masterModelList.add(new Model("Размер списка: " + masterModelList.size() + plainItem));
     }
 
     private void packModelList() {

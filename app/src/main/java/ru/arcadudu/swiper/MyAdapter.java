@@ -32,10 +32,21 @@ public class MyAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemViewType(int position) {
         Model model = modelList.get(position);
-        if (model.getLink() != null) { // ads
+
+        // ads
+        if (model.isAds()) {
             return 0;
         }
-        return model.getContent() == null ? 1 : 2; // plain item : regular item
+
+        // plain
+        if (model.getContent() == null) {
+            return 1;
+        }
+
+        // regular
+        return 2;
+
+
     }
 
     @NonNull
@@ -44,13 +55,13 @@ public class MyAdapter extends RecyclerView.Adapter {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view;
 
+
         // ads
         if (viewType == 0) {
             view = inflater.inflate(R.layout.model_item_layout_ads, parent, false);
             return new ViewHolderAds(view);
             // plain
-        }
-        if (viewType == 1) {
+        } else if (viewType == 1) {
             view = inflater.inflate(R.layout.model_item_layout_plain, parent, false);
             return new ViewHolderPlain(view);
 
@@ -66,21 +77,36 @@ public class MyAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Model model = modelList.get(position);
 
-        // ads model
-        if (model.getLink() != null) {
+        if(model.isAds()){
             ViewHolderAds viewHolderAds = (ViewHolderAds) holder;
-            Glide.with(context).load(model.getLink()).into(viewHolderAds.adsImage);
-            // plain model
-        } else if (model.getContent() == null) {
-            ViewHolderPlain viewHolderPlain = (ViewHolderPlain) holder;
-            viewHolderPlain.title.setText(model.getTitle());
-            // regular model
-        } else {
-            ViewHolderRegular viewHolderRegular = (ViewHolderRegular) holder;
-            viewHolderRegular.title.setText(model.getTitle());
-            viewHolderRegular.content.setText(model.getContent());
-            viewHolderRegular.image.setImageResource(model.getImage());
+                Glide.with(context).load(model.getLink()).into(viewHolderAds.adsImage);
+        }else{
+            if(model.getContent()==null){
+                ViewHolderPlain viewHolderPlain = (ViewHolderPlain) holder;
+                viewHolderPlain.title.setText(model.getTitle());
+            }else{
+                ViewHolderRegular viewHolderRegular = (ViewHolderRegular) holder;
+                viewHolderRegular.title.setText(model.getTitle());
+                viewHolderRegular.content.setText(model.getContent());
+                viewHolderRegular.image.setImageResource(model.getImage());
+            }
         }
+//        // ads model
+//        if (model.getLink() != null ) {
+//            if(model.isAds()){
+//                ViewHolderAds viewHolderAds = (ViewHolderAds) holder;
+//                Glide.with(context).load(model.getLink()).into(viewHolderAds.adsImage);
+//            }else{
+//                ViewHolderPlain viewHolderPlain = (ViewHolderPlain) holder;
+//                viewHolderPlain.title.setText(model.getTitle());
+//            }
+//
+//        } else {
+//            ViewHolderRegular viewHolderRegular = (ViewHolderRegular) holder;
+//            viewHolderRegular.title.setText(model.getTitle());
+//            viewHolderRegular.content.setText(model.getContent());
+//            viewHolderRegular.image.setImageResource(model.getImage());
+//        }
     }
 
     @Override

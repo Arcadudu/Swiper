@@ -1,5 +1,6 @@
 package ru.arcadudu.swiper;
 
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.util.Log;
@@ -90,20 +91,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     fabMain.show();
-//                    transparentBackground.setAlpha(0f);
-//                    Animation fadeOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out);
-//                    transparentBackground.startAnimation(fadeOut);
-//                    CountDownTimer timer = new CountDownTimer(410, 0) {
-//                        @Override
-//                        public void onTick(long millisUntilFinished) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onFinish() {
-//                            transparentBackground.setAlpha(0f);
-//                        }
-//                    }.start();
                 } else {
                     fabMain.hide();
                 }
@@ -168,11 +155,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // interface
     @Override
-    public void click(Model model) {
+    public void longClick(Model model) {
+        Log.d("model", "longClick: mainActivity model is null? "+(model==null));
         bs_image.setImageResource(model.getImage());
         bs_title.setText(model.getTitle());
         bs_description.setText(model.getDescription());
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+    }
+
+    @Override
+    public void click(Model model) {
+        Intent intent = new Intent(this, DetailsActivity.class);
+        intent.putExtra("selected_model", model);
+        startActivity(intent);
     }
 
     @Override

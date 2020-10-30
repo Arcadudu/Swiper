@@ -134,9 +134,21 @@ public class MyAdapter extends RecyclerView.Adapter {
                 }
             });
 
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    goToDetails(position);
+                }
+            });
+
         }
 
         private void openBottomSheet(int position) {
+            longClickCallBack.longClick(modelList.get(position));
+        }
+
+        private void goToDetails(int position){
             longClickCallBack.click(modelList.get(position));
         }
     }

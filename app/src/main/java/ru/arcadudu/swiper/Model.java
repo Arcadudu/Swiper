@@ -61,10 +61,12 @@ public class Model implements Serializable {
     // ads model
     private String link;
     private boolean ads;
+    private String sourceLink;
 
-    public Model(String link, boolean ads) {
+    public Model(String link, boolean ads, String sourceLink) {
         this.link = link;
         this.ads = ads;
+        this.sourceLink = sourceLink;
     }
 
     public String getLink() {
@@ -73,6 +75,14 @@ public class Model implements Serializable {
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+    public String getSourceLink() {
+        return sourceLink;
+    }
+
+    public void setSourceLink(String sourceLink) {
+        this.sourceLink = sourceLink;
     }
 
     public boolean isAds() {

@@ -1,6 +1,9 @@
 package ru.arcadudu.swiper;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,13 +24,20 @@ public class MyAdapter extends RecyclerView.Adapter {
     private Context context;
 
     ILongClickCallBack longClickCallBack;
+    ClickCallback clickCallback;
+    Linkable linkable;
 
 
-    public MyAdapter(List<Model> modelList, Context context, ILongClickCallBack iLongClickCallBack) {
+    public MyAdapter(List<Model> modelList, Context context, ILongClickCallBack iLongClickCallBack,
+                     ClickCallback clickCallback, Linkable linkable) {
         this.modelList = modelList;
         this.context = context;
         this.longClickCallBack = iLongClickCallBack;
+        this.clickCallback = clickCallback;
+        this.linkable = linkable;
     }
+
+
 
     @Override
     public int getItemViewType(int position) {
@@ -91,22 +101,6 @@ public class MyAdapter extends RecyclerView.Adapter {
                 viewHolderRegular.image.setImageResource(model.getImage());
             }
         }
-//        // ads model
-//        if (model.getLink() != null ) {
-//            if(model.isAds()){
-//                ViewHolderAds viewHolderAds = (ViewHolderAds) holder;
-//                Glide.with(context).load(model.getLink()).into(viewHolderAds.adsImage);
-//            }else{
-//                ViewHolderPlain viewHolderPlain = (ViewHolderPlain) holder;
-//                viewHolderPlain.title.setText(model.getTitle());
-//            }
-//
-//        } else {
-//            ViewHolderRegular viewHolderRegular = (ViewHolderRegular) holder;
-//            viewHolderRegular.title.setText(model.getTitle());
-//            viewHolderRegular.content.setText(model.getContent());
-//            viewHolderRegular.image.setImageResource(model.getImage());
-//        }
     }
 
     @Override
@@ -114,6 +108,7 @@ public class MyAdapter extends RecyclerView.Adapter {
         return modelList.size();
     }
 
+    // regular item
     class ViewHolderRegular extends RecyclerView.ViewHolder {
 
         private ImageView image;
@@ -149,48 +144,53 @@ public class MyAdapter extends RecyclerView.Adapter {
         }
 
         private void goToDetails(int position){
-            longClickCallBack.click(modelList.get(position));
+            Model model = modelList.get(position);
+            clickCallback.click(model);
         }
+
     }
 
-    class ViewHolderPlain extends RecyclerView.ViewHolder {
-
-        private TextView title;
-
-        public ViewHolderPlain(@NonNull View itemView) {
-            super(itemView);
-            title = itemView.findViewById(R.id.tv_plain_text);
-        }
-    }
-
+    // ads item
     class ViewHolderAds extends RecyclerView.ViewHolder {
 
         private ImageView adsImage;
+        private final String sourceLink = "https://dodopizza.ru/novorossiysk";
 
         public ViewHolderAds(@NonNull View itemView) {
             super(itemView);
             adsImage = itemView.findViewById(R.id.image_ads);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    getLink(position);
+                }
+            });
+
         }
+
+        private void getLink(int position){
+            Model model = modelList.get(position);
+            linkable.goToSource(model);
+        }
+
+    }
+
+    // plain text item
+    class ViewHolderPlain extends RecyclerView.ViewHolder {
+
+
+        private TextView title;
+        public ViewHolderPlain(@NonNull View itemView) {
+            super(itemView);
+            title = itemView.findViewById(R.id.tv_plain_text);
+        }
+
     }
 
 
 }
 
-//        private void openBottomSheet(int position) {
-//            longClickCallBack.click(modelList.get(position));
-//        }
 
-//itemView.setOnLongClickListener(new View.OnLongClickListener() {
-//                @Override
-//                public boolean onLongClick(View v) {
-//                    int position = getAdapterPosition();
-//                    openBottomSheet(position);
-//                    return true;
-//                }
-//            });
-
-
-//    private void openBottomSheet(int position) {
-//            longClickCallBack.click(modelList.get(position));
-//        }
 

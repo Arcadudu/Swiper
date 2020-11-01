@@ -8,7 +8,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
 
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="@android:color/holo_green_light"
         android:orientation="vertical"
         tools:context=".MainActivity">
@@ -16,10 +16,11 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_main"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_height="88dp"
+            android:gravity="bottom|start"
+            android:paddingBottom="10dp"
             android:background="@color/holo_green_dark"
-            android:textAlignment="viewStart"
+            android:textAlignment="gravity"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -46,11 +47,11 @@
             android:id="@+id/recycler"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
             app:layout_constraintEnd_toEndOf="parent"
+            android:paddingBottom="88dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar_main"
-            android:paddingBottom="160dp"/>
+            />
 
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

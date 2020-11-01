@@ -2,6 +2,7 @@ package ru.arcadudu.swiper;
 
 import android.content.Intent;
 import android.graphics.Canvas;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -27,7 +28,7 @@ import java.util.List;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, ILongClickCallBack {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, ILongClickCallBack , ClickCallback, Linkable{
 
 
     // recycler
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView tv_emptyListSign;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         recyclerView = findViewById(R.id.recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new MyAdapter(recyclerModelList, this, this);
+        adapter = new MyAdapter(recyclerModelList, this, this, this, this);
         new ItemTouchHelper(simpleCallback).attachToRecyclerView(recyclerView);
         recyclerView.setAdapter(adapter);
 //        adapter.setLongClickCallBack(this);
@@ -116,10 +118,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-            int position = viewHolder.getAdapterPosition();
-            switch (direction) {
+
+            // if item is regular
+            if (viewHolder.getClass() == MyAdapter.ViewHolderRegular.class) {
+                int position = viewHolder.getAdapterPosition();
                 // left - delete:
-                case ItemTouchHelper.LEFT:
+                if (direction == ItemTouchHelper.LEFT) {
                     chosenModel = recyclerModelList.get(position);
                     recyclerModelList.remove(chosenModel);
                     adapter.notifyDataSetChanged();
@@ -131,14 +135,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     adapter.notifyDataSetChanged();
                                 }
                             }).show();
-                    break;
-
+                }
             }
+
         }
 
         public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
 
-
+            // if item is regular
             if (viewHolder.getClass() == MyAdapter.ViewHolderRegular.class) {
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
                 new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
@@ -148,15 +152,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .create()
                         .decorate();
             }
-
-
         }
     };
 
     // interface
     @Override
     public void longClick(Model model) {
-        Log.d("model", "longClick: mainActivity model is null? "+(model==null));
+        Log.d("model", "longClick: mainActivity model is null? " + (model == null));
         bs_image.setImageResource(model.getImage());
         bs_title.setText(model.getTitle());
         bs_description.setText(model.getDescription());
@@ -167,6 +169,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void click(Model model) {
         Intent intent = new Intent(this, DetailsActivity.class);
         intent.putExtra("selected_model", model);
+//        intent.putExtra("title", model.getTitle());
+//        intent.putExtra("description", model.getDescription());
+//        intent.putExtra("image", model.getImage());
         startActivity(intent);
     }
 
@@ -235,12 +240,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         masterModelList.add(new Model(getString(R.string.javascript), getString(R.string.javascript) + content, R.drawable.icon_javascript, getString(R.string.java_script_description)));
         masterModelList.add(new Model(getString(R.string.haskell), getString(R.string.haskell) + content, R.drawable.icon_haskel, getString(R.string.haskell_description)));
         //ads model
-        masterModelList.add(new Model("https://brandbook.dodopizza.info/BillboardMockup.a2ad115b.jpg", true));
+        masterModelList.add(new Model("https://brandbook.dodopizza.info/BillboardMockup.a2ad115b.jpg", true, "https://dodopizza.ru/novorossiysk"));
 
         masterModelList.add(new Model(getString(R.string.python), getString(R.string.python) + content, R.drawable.icon_python, getString(R.string.python_description)));
         masterModelList.add(new Model(getString(R.string.csharp), getString(R.string.csharp) + content, R.drawable.icon_c_sharp, getString(R.string.csharp_description)));
         masterModelList.add(new Model(getString(R.string.ruby), getString(R.string.ruby) + content, R.drawable.icon_ruby, getString(R.string.ruby_description)));
-        masterModelList.add(new Model("Размер списка: " + masterModelList.size() + plainItem));
+        masterModelList.add(new Model("Размер списка: " + countDownItems(masterModelList)+ plainItem));
+
     }
 
     private void packModelList() {
@@ -256,6 +262,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
 
+//        masterModelList.add(new Model("Размер списка: " + masterModelList.size() + plainItem));
+
+
+
+    }
+
+    private int countDownItems(List<Model> list){
+        int count = 0;
+        for (Model model : list) {
+            if(model.getContent()!=null){
+                count+=1;
+            }
+        }
+        return count;
     }
 
     private void checkIfListIsEmpty() {
@@ -298,4 +318,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fabDeleteAll.setEnabled(false);
     }
 
+
+    @Override
+    public void goToSource(Model model) {
+        String linkSource = model.getSourceLink();
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(linkSource));
+        startActivity(browserIntent);
+    }
 }

@@ -23,11 +23,17 @@ public class DetailsActivity extends AppCompatActivity {
         description = findViewById(R.id.detailed_description);
 
         Intent incomingIntent = getIntent();
-        Model model = incomingIntent.getParcelableExtra("selected_model");
-        Log.d("model", "onCreate: details activity " + (model == null));
-//        image.setImageResource(model.getImage());
-//        title.setText(model.getTitle());
-//        description.setText(model.getTitle());
+        Model model = (Model) incomingIntent.getSerializableExtra("selected_model");
+
+
+        String modelTitle = model.getTitle();
+        String modelDescription = model.getDescription();
+        int modelImage = model.getImage();
+        title.setText(modelTitle);
+        description.setText(modelDescription);
+        image.setImageResource(modelImage);
 
     }
+
+
 }
